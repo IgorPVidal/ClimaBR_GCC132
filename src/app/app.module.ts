@@ -12,6 +12,11 @@ import { LoadWeatherService } from 'src/domain/services/load-weather.service';
 import { LocalCityRepository } from 'src/data/local-city-repository';
 import { ApiWeatherRepository } from 'src/data/api-weather-repository';
 
+import { ServicoDeHistorico } from 'src/domain/services/servico-de-historico';
+import { RepositorioHistoricoLocal } from 'src/data/repositorio-historico-local';
+import { IonicStorageModule } from '@ionic/storage-angular';
+import { Storage } from '@ionic/storage-angular';
+
 const createSearchCityService = () => {
   return new SearchCityService(new LocalCityRepository());
 };
@@ -23,6 +28,13 @@ const createLoadWeatherService = (http: HttpClient) => {
   );
 };
 
+const createServicoDeHistorico = () => {
+  return new ServicoDeHistorico(
+    new RepositorioHistoricoLocal(new Storage()), 
+    new LocalCityRepository()
+  );
+}
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -31,6 +43,7 @@ const createLoadWeatherService = (http: HttpClient) => {
     IonicModule.forRoot(),
     AppRoutingModule,
     HttpClientModule,
+    IonicStorageModule.forRoot(),
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
@@ -42,6 +55,10 @@ const createLoadWeatherService = (http: HttpClient) => {
       provide: LoadWeatherService,
       useFactory: createLoadWeatherService,
       deps: [HttpClient],
+    },
+    {
+      provide: ServicoDeHistorico,
+      useFactory: createServicoDeHistorico,
     },
   ],
   bootstrap: [AppComponent],
